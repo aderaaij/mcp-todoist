@@ -27,7 +27,7 @@ export async function handleUtilityAction(
       const result = await handleTestConnection(api);
       return `Connection Status: ${result.status}\nMessage: ${result.message}${result.responseTime ? `\nResponse Time: ${result.responseTime}ms` : ""}${result.error ? `\nError: ${result.error}` : ""}`;
     }
-    case "test_all_features": {
+    case "test_features": {
       const mode = args.mode as "basic" | "enhanced" | undefined;
       const result = await handleTestAllFeatures(api, { mode }, apiToken);
       if (

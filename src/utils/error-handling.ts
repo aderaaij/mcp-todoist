@@ -68,19 +68,28 @@ export class ErrorHandler {
     // };
 
     if (error instanceof Error) {
-      // Check for authentication errors
+      // Re-throw known error types directly to preserve their message
+      if (
+        error instanceof TodoistAPIError ||
+        error instanceof ValidationError ||
+        error instanceof AuthenticationError
+      ) {
+        throw error;
+      }
+
+      // Check for authentication errors by message pattern
       if (this.isAuthenticationError(error)) {
         throw new AuthenticationError();
       }
 
-      // Check for validation errors
+      // Check for validation errors by message pattern
       if (this.isValidationError(error)) {
         throw new ValidationError(
           `Validation failed during ${operation}: ${error.message}`
         );
       }
 
-      throw new TodoistAPIError(`Failed to ${operation}`, error);
+      throw new TodoistAPIError(`Failed to ${operation}: ${error.message}`);
     }
 
     throw new TodoistAPIError(
