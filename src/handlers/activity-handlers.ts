@@ -43,7 +43,7 @@ async function fetchActivity(
     }
   }
 
-  const url = `${SYNC_API_URL}/activity/get?${queryParams.toString()}`;
+  const url = `${SYNC_API_URL}/activity/logs?${queryParams.toString()}`;
 
   const response = await fetch(url, {
     method: "GET",

@@ -26,11 +26,10 @@ export async function handleGetBackups(): Promise<string> {
 
   const token = getApiToken();
 
-  const response = await fetch(`${SYNC_API_URL}/backups/get`, {
-    method: "POST",
+  const response = await fetch(`${SYNC_API_URL}/backups`, {
+    method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/x-www-form-urlencoded",
     },
   });
 

@@ -114,12 +114,11 @@ export async function handleGetProductivityStats(): Promise<string> {
   const token = getApiToken();
 
   const response = await fetch(
-    "https://api.todoist.com/api/v1/completed/get_stats",
+    "https://api.todoist.com/api/v1/user/productivity_stats",
     {
-      method: "POST",
+      method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/x-www-form-urlencoded",
       },
     }
   );
