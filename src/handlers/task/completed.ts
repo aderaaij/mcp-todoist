@@ -14,15 +14,15 @@ import { ErrorHandler } from "../../utils/error-handling.js";
 interface CompletedTaskV1 {
   id: string;
   content: string;
-  projectId: string;
-  sectionId?: string;
-  completedAt: string;
-  taskId: string;
+  project_id: string;
+  section_id?: string;
+  completed_at: string;
+  task_id: string;
 }
 
 interface CompletedTasksV1Response {
   items: CompletedTaskV1[];
-  nextCursor: string | null;
+  next_cursor: string | null;
 }
 
 /**
@@ -113,16 +113,16 @@ export async function handleGetCompletedTasks(
     let result = `${taskCount} completed ${taskWord} found:\n\n`;
 
     for (const item of data.items) {
-      const completedDate = item.completedAt.split("T")[0];
+      const completedDate = item.completed_at?.split("T")[0] ?? "unknown";
 
       result += `- ${item.content}\n`;
       result += `  Completed: ${completedDate}\n`;
-      result += `  Project ID: ${item.projectId}\n`;
+      result += `  Project ID: ${item.project_id}\n`;
       result += "\n";
     }
 
-    if (data.nextCursor) {
-      result += `\nMore results available. Use cursor: "${data.nextCursor}" to fetch the next page.`;
+    if (data.next_cursor) {
+      result += `\nMore results available. Use cursor: "${data.next_cursor}" to fetch the next page.`;
     }
 
     return result.trim();
