@@ -92,7 +92,7 @@ describe("Activity Handlers", () => {
       expect(result).toBe("No activity events found matching the criteria.");
     });
 
-    it("should pass filter parameters to the API using camelCase", async () => {
+    it("should pass filter parameters to the API using snake_case", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ results: [] }),
@@ -105,8 +105,8 @@ describe("Activity Handlers", () => {
       });
 
       const calledUrl = mockFetch.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("objectType=item");
-      expect(calledUrl).toContain("eventType=added");
+      expect(calledUrl).toContain("object_type=item");
+      expect(calledUrl).toContain("event_type=added");
       expect(calledUrl).toContain("limit=10");
     });
 
@@ -156,7 +156,7 @@ describe("Activity Handlers", () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const calledUrl = mockFetch.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("parentProjectId=project456");
+      expect(calledUrl).toContain("parent_project_id=project456");
       expect(result).toContain("Found 2 activity events");
     });
 
@@ -176,9 +176,9 @@ describe("Activity Handlers", () => {
       });
 
       const calledUrl = mockFetch.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("parentProjectId=project456");
-      expect(calledUrl).toContain("eventType=completed");
-      expect(calledUrl).toContain("objectType=item");
+      expect(calledUrl).toContain("parent_project_id=project456");
+      expect(calledUrl).toContain("event_type=completed");
+      expect(calledUrl).toContain("object_type=item");
       expect(calledUrl).toContain("since=2024-01-01");
       expect(calledUrl).toContain("until=2024-01-31");
       expect(calledUrl).toContain("limit=20");
@@ -248,9 +248,9 @@ describe("Activity Handlers", () => {
       const calledUrl = mockFetch.mock.calls[0][0] as string;
       expect(calledUrl).toContain("since=2024-01-01");
       expect(calledUrl).toContain("until=2024-01-31");
-      expect(calledUrl).toContain("objectType=project");
-      expect(calledUrl).toContain("eventType=added");
-      expect(calledUrl).toContain("parentProjectId=project789");
+      expect(calledUrl).toContain("object_type=project");
+      expect(calledUrl).toContain("event_type=added");
+      expect(calledUrl).toContain("parent_project_id=project789");
       expect(calledUrl).toContain("limit=50");
     });
 

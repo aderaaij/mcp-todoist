@@ -68,7 +68,7 @@ export async function handleGetCompletedTasks(
     params.append("since", toIsoDatetime(args.since));
     params.append("until", toIsoDatetime(args.until));
     if (args.project_id) {
-      params.append("projectId", args.project_id);
+      params.append("project_id", args.project_id);
     }
     if (args.limit !== undefined) {
       params.append("limit", args.limit.toString());

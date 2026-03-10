@@ -129,12 +129,12 @@ export async function handleGetActivity(
 
   try {
     const events = await fetchActivity({
-      objectType: args.object_type,
-      objectId: args.object_id,
-      eventType: args.event_type,
-      parentProjectId: args.parent_project_id,
-      parentItemId: args.parent_item_id,
-      initiatorId: args.initiator_id,
+      object_type: args.object_type,
+      object_id: args.object_id,
+      event_type: args.event_type,
+      parent_project_id: args.parent_project_id,
+      parent_item_id: args.parent_item_id,
+      initiator_id: args.initiator_id,
       since: args.since,
       until: args.until,
       limit: args.limit,
@@ -169,9 +169,9 @@ export async function handleGetActivityByProject(
 
   try {
     const events = await fetchActivity({
-      parentProjectId: args.project_id,
-      eventType: args.event_type,
-      objectType: args.object_type,
+      parent_project_id: args.project_id,
+      event_type: args.event_type,
+      object_type: args.object_type,
       since: args.since,
       until: args.until,
       limit: args.limit,
@@ -208,9 +208,9 @@ export async function handleGetActivityByDateRange(
     const events = await fetchActivity({
       since: args.since,
       until: args.until,
-      objectType: args.object_type,
-      eventType: args.event_type,
-      parentProjectId: args.project_id,
+      object_type: args.object_type,
+      event_type: args.event_type,
+      parent_project_id: args.project_id,
       limit: args.limit,
     });
 
