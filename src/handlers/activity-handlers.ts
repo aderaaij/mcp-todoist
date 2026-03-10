@@ -54,6 +54,11 @@ async function fetchActivity(
 
   if (!response.ok) {
     const errorText = await response.text();
+    if (response.status === 403) {
+      throw new TodoistAPIError(
+        `Activity log requires Todoist Pro or Business plan (403 Forbidden). ${errorText}`
+      );
+    }
     throw new TodoistAPIError(
       `Activity API request failed: ${response.status} ${response.statusText} - ${errorText}`
     );
@@ -137,9 +142,11 @@ export async function handleGetActivity(
 
     return formatActivityEvents(events);
   } catch (error) {
+    if (error instanceof TodoistAPIError) {
+      throw error;
+    }
     throw new TodoistAPIError(
-      "Failed to fetch activity log",
-      error instanceof Error ? error : undefined
+      `Failed to fetch activity log: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
@@ -173,9 +180,11 @@ export async function handleGetActivityByProject(
 
     return formatActivityEvents(events);
   } catch (error) {
+    if (error instanceof TodoistAPIError) {
+      throw error;
+    }
     throw new TodoistAPIError(
-      `Failed to fetch activity log for project ${args.project_id}`,
-      error instanceof Error ? error : undefined
+      `Failed to fetch activity log for project ${args.project_id}: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
@@ -209,9 +218,11 @@ export async function handleGetActivityByDateRange(
 
     return formatActivityEvents(events);
   } catch (error) {
+    if (error instanceof TodoistAPIError) {
+      throw error;
+    }
     throw new TodoistAPIError(
-      `Failed to fetch activity log for date range ${args.since} to ${args.until}`,
-      error instanceof Error ? error : undefined
+      `Failed to fetch activity log for date range ${args.since} to ${args.until}: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
