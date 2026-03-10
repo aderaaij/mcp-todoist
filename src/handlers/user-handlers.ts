@@ -114,7 +114,7 @@ export async function handleGetProductivityStats(): Promise<string> {
   const token = getApiToken();
 
   const response = await fetch(
-    "https://api.todoist.com/api/v1/user/productivity_stats",
+    "https://api.todoist.com/api/v1/tasks/completed/stats",
     {
       method: "GET",
       headers: {

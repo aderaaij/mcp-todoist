@@ -51,14 +51,14 @@ describe("Activity Handlers", () => {
     it("should fetch and format activity events successfully", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: sampleActivityEvents }),
+        json: async () => ({ results: sampleActivityEvents }),
       });
 
       const result = await handleGetActivity({});
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("https://api.todoist.com/api/v1/activity/logs"),
+        expect.stringContaining("https://api.todoist.com/api/v1/activities"),
         expect.objectContaining({
           method: "GET",
           headers: { Authorization: "Bearer test-token-123" },
@@ -84,7 +84,7 @@ describe("Activity Handlers", () => {
     it("should return empty message when no events found", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: [] }),
+        json: async () => ({ results: [] }),
       });
 
       const result = await handleGetActivity({});
@@ -92,24 +92,22 @@ describe("Activity Handlers", () => {
       expect(result).toBe("No activity events found matching the criteria.");
     });
 
-    it("should pass filter parameters to the API", async () => {
+    it("should pass filter parameters to the API using camelCase", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: [] }),
+        json: async () => ({ results: [] }),
       });
 
       await handleGetActivity({
         object_type: "item",
         event_type: "added",
         limit: 10,
-        offset: 5,
       });
 
       const calledUrl = mockFetch.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("object_type=item");
-      expect(calledUrl).toContain("event_type=added");
+      expect(calledUrl).toContain("objectType=item");
+      expect(calledUrl).toContain("eventType=added");
       expect(calledUrl).toContain("limit=10");
-      expect(calledUrl).toContain("offset=5");
     });
 
     it("should throw TodoistAPIError on API failure", async () => {
@@ -132,7 +130,7 @@ describe("Activity Handlers", () => {
     it("should use cached results on subsequent calls", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: sampleActivityEvents }),
+        json: async () => ({ results: sampleActivityEvents }),
       });
 
       // First call - should hit API
@@ -149,7 +147,7 @@ describe("Activity Handlers", () => {
     it("should fetch activity for a specific project", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: sampleActivityEvents }),
+        json: async () => ({ results: sampleActivityEvents }),
       });
 
       const result = await handleGetActivityByProject({
@@ -158,14 +156,14 @@ describe("Activity Handlers", () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const calledUrl = mockFetch.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("parent_project_id=project456");
+      expect(calledUrl).toContain("parentProjectId=project456");
       expect(result).toContain("Found 2 activity events");
     });
 
     it("should pass optional filters to the API", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: [] }),
+        json: async () => ({ results: [] }),
       });
 
       await handleGetActivityByProject({
@@ -178,9 +176,9 @@ describe("Activity Handlers", () => {
       });
 
       const calledUrl = mockFetch.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("parent_project_id=project456");
-      expect(calledUrl).toContain("event_type=completed");
-      expect(calledUrl).toContain("object_type=item");
+      expect(calledUrl).toContain("parentProjectId=project456");
+      expect(calledUrl).toContain("eventType=completed");
+      expect(calledUrl).toContain("objectType=item");
       expect(calledUrl).toContain("since=2024-01-01");
       expect(calledUrl).toContain("until=2024-01-31");
       expect(calledUrl).toContain("limit=20");
@@ -189,7 +187,7 @@ describe("Activity Handlers", () => {
     it("should return empty message for project with no activity", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: [] }),
+        json: async () => ({ results: [] }),
       });
 
       const result = await handleGetActivityByProject({
@@ -217,7 +215,7 @@ describe("Activity Handlers", () => {
     it("should fetch activity within a date range", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: sampleActivityEvents }),
+        json: async () => ({ results: sampleActivityEvents }),
       });
 
       const result = await handleGetActivityByDateRange({
@@ -235,7 +233,7 @@ describe("Activity Handlers", () => {
     it("should pass optional filters to the API", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: [] }),
+        json: async () => ({ results: [] }),
       });
 
       await handleGetActivityByDateRange({
@@ -245,23 +243,21 @@ describe("Activity Handlers", () => {
         event_type: "added",
         project_id: "project789",
         limit: 50,
-        offset: 10,
       });
 
       const calledUrl = mockFetch.mock.calls[0][0] as string;
       expect(calledUrl).toContain("since=2024-01-01");
       expect(calledUrl).toContain("until=2024-01-31");
-      expect(calledUrl).toContain("object_type=project");
-      expect(calledUrl).toContain("event_type=added");
-      expect(calledUrl).toContain("parent_project_id=project789");
+      expect(calledUrl).toContain("objectType=project");
+      expect(calledUrl).toContain("eventType=added");
+      expect(calledUrl).toContain("parentProjectId=project789");
       expect(calledUrl).toContain("limit=50");
-      expect(calledUrl).toContain("offset=10");
     });
 
     it("should return empty message for date range with no activity", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: [] }),
+        json: async () => ({ results: [] }),
       });
 
       const result = await handleGetActivityByDateRange({
@@ -302,7 +298,7 @@ describe("Activity Handlers", () => {
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ events: eventsWithExtraData }),
+        json: async () => ({ results: eventsWithExtraData }),
       });
 
       const result = await handleGetActivityByDateRange({
@@ -320,7 +316,7 @@ describe("Activity Handlers", () => {
     it("should clear cached results forcing fresh API calls", async () => {
       mockFetch.mockResolvedValue({
         ok: true,
-        json: async () => ({ events: sampleActivityEvents }),
+        json: async () => ({ results: sampleActivityEvents }),
       });
 
       // First call - hits API

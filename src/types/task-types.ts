@@ -186,8 +186,7 @@ export interface GetCompletedTasksArgs {
   since?: string;
   until?: string;
   limit?: number;
-  offset?: number;
-  annotate_notes?: boolean;
+  cursor?: string;
 }
 
 /**

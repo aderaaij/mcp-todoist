@@ -24,9 +24,7 @@ export function isGetCompletedTasksArgs(
     (obj.since === undefined || typeof obj.since === "string") &&
     (obj.until === undefined || typeof obj.until === "string") &&
     (obj.limit === undefined || typeof obj.limit === "number") &&
-    (obj.offset === undefined || typeof obj.offset === "number") &&
-    (obj.annotate_notes === undefined ||
-      typeof obj.annotate_notes === "boolean")
+    (obj.cursor === undefined || typeof obj.cursor === "string")
   );
 }
 

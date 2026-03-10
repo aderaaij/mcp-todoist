@@ -186,7 +186,7 @@ describe("User Handlers", () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch).toHaveBeenCalledWith(
-        "https://api.todoist.com/api/v1/user/productivity_stats",
+        "https://api.todoist.com/api/v1/tasks/completed/stats",
         expect.objectContaining({
           method: "GET",
           headers: {

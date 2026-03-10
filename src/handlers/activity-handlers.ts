@@ -12,7 +12,7 @@ import { SimpleCache } from "../cache.js";
 const activityCache = new SimpleCache<ActivityResponse>(30000);
 
 // Base URL for Todoist Sync API
-const SYNC_API_URL = "https://api.todoist.com/api/v1";
+const API_BASE_URL = "https://api.todoist.com/api/v1";
 
 /**
  * Get the API token from the environment
@@ -43,7 +43,7 @@ async function fetchActivity(
     }
   }
 
-  const url = `${SYNC_API_URL}/activity/logs?${queryParams.toString()}`;
+  const url = `${API_BASE_URL}/activities?${queryParams.toString()}`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -66,7 +66,11 @@ async function fetchActivity(
 
   const data = await response.json();
 
-  // The API returns an object with "events" array or directly an array
+  // v1 API returns { results: [], nextCursor: ... }
+  if (data && Array.isArray(data.results)) {
+    return data.results as ActivityLogEvent[];
+  }
+  // Fallback for other response formats
   if (Array.isArray(data)) {
     return data as ActivityLogEvent[];
   }
@@ -125,16 +129,15 @@ export async function handleGetActivity(
 
   try {
     const events = await fetchActivity({
-      object_type: args.object_type,
-      object_id: args.object_id,
-      event_type: args.event_type,
-      parent_project_id: args.parent_project_id,
-      parent_item_id: args.parent_item_id,
-      initiator_id: args.initiator_id,
+      objectType: args.object_type,
+      objectId: args.object_id,
+      eventType: args.event_type,
+      parentProjectId: args.parent_project_id,
+      parentItemId: args.parent_item_id,
+      initiatorId: args.initiator_id,
       since: args.since,
       until: args.until,
       limit: args.limit,
-      offset: args.offset,
     });
 
     const response: ActivityResponse = { events, count: events.length };
@@ -166,13 +169,12 @@ export async function handleGetActivityByProject(
 
   try {
     const events = await fetchActivity({
-      parent_project_id: args.project_id,
-      event_type: args.event_type,
-      object_type: args.object_type,
+      parentProjectId: args.project_id,
+      eventType: args.event_type,
+      objectType: args.object_type,
       since: args.since,
       until: args.until,
       limit: args.limit,
-      offset: args.offset,
     });
 
     const response: ActivityResponse = { events, count: events.length };
@@ -206,11 +208,10 @@ export async function handleGetActivityByDateRange(
     const events = await fetchActivity({
       since: args.since,
       until: args.until,
-      object_type: args.object_type,
-      event_type: args.event_type,
-      parent_project_id: args.project_id,
+      objectType: args.object_type,
+      eventType: args.event_type,
+      parentProjectId: args.project_id,
       limit: args.limit,
-      offset: args.offset,
     });
 
     const response: ActivityResponse = { events, count: events.length };
