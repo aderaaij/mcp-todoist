@@ -8,8 +8,9 @@ import {
   validateProjectId,
   VALIDATION_LIMITS,
 } from "../../validation/index.js";
-import { extractApiToken } from "../../utils/api-helpers.js";
+import { extractApiToken, resolveProjectNames } from "../../utils/api-helpers.js";
 import { ErrorHandler } from "../../utils/error-handling.js";
+import { API_V1_BASE } from "../../utils/api-constants.js";
 
 interface CompletedTaskV1 {
   id: string;
@@ -38,6 +39,8 @@ function toIsoDatetime(value: string): string {
 
 /**
  * Fetches completed tasks from the Todoist API v1.
+ * The v1 endpoint requires since/until params (max 3 month range)
+ * and uses cursor-based pagination instead of offset.
  */
 export async function handleGetCompletedTasks(
   todoistClient: TodoistApi,
@@ -57,12 +60,19 @@ export async function handleGetCompletedTasks(
     if (process.env.DRYRUN === "true") {
       console.error("[DRY-RUN] Would fetch completed tasks from API v1");
       console.error(
-        `[DRY-RUN] Parameters: projectId=${args.project_id || "all"}, since=${args.since}, until=${args.until}, limit=${args.limit || 200}`
+        `[DRY-RUN] Parameters: project_id=${args.project_id || "all"}, since=${args.since}, until=${args.until}, limit=${args.limit || 200}`
       );
       return "DRY-RUN: Would retrieve completed tasks from Todoist API v1. No actual API call made.";
     }
 
     const apiToken = extractApiToken(todoistClient);
+
+    // v1 API requires since/until — default to last 2 weeks if not provided
+    const now = new Date();
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const since =
+      args.since || twoWeeksAgo.toISOString().replace(/\.\d{3}Z$/, "Z");
+    const until = args.until || now.toISOString().replace(/\.\d{3}Z$/, "Z");
 
     const params = new URLSearchParams();
     params.append("since", toIsoDatetime(args.since));
@@ -77,8 +87,7 @@ export async function handleGetCompletedTasks(
       params.append("cursor", args.cursor);
     }
 
-    const queryString = params.toString();
-    const url = `https://api.todoist.com/api/v1/tasks/completed/by_completion_date?${queryString}`;
+    const url = `${API_V1_BASE}/tasks/completed/by_completion_date?${params.toString()}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -106,6 +115,9 @@ export async function handleGetCompletedTasks(
     if (!data.items || data.items.length === 0) {
       return "No completed tasks found matching the criteria.";
     }
+
+    const projectIds = data.items.map((item) => item.project_id);
+    const projectNames = await resolveProjectNames(todoistClient, projectIds);
 
     const taskCount = data.items.length;
     const taskWord = taskCount === 1 ? "task" : "tasks";

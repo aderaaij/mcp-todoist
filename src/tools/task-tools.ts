@@ -23,7 +23,8 @@ export const CREATE_TASK_TOOL: Tool = {
       },
       priority: {
         type: "number",
-        description: "Task priority from 1 (highest) to 4 (lowest) (optional)",
+        description:
+          "Priority level: 1=P1 (urgent), 2=P2, 3=P3, 4=P4 (normal) (optional)",
         enum: [1, 2, 3, 4],
       },
       labels: {
@@ -101,7 +102,7 @@ export const GET_TASKS_TOOL: Tool = {
       priority: {
         type: "number",
         description:
-          "Filter tasks by priority level 1 (highest) to 4 (lowest) (optional)",
+          "Filter tasks by priority: 1=P1 (urgent), 2=P2, 3=P3, 4=P4 (normal) (optional)",
         enum: [1, 2, 3, 4],
       },
       limit: {
@@ -170,7 +171,8 @@ export const UPDATE_TASK_TOOL: Tool = {
       },
       priority: {
         type: "number",
-        description: "New priority from 1 (normal) to 4 (urgent) (optional)",
+        description:
+          "New priority from 1 (P1/urgent) to 4 (P4/normal) (optional)",
         enum: [1, 2, 3, 4],
       },
       labels: {
@@ -377,7 +379,7 @@ export const BULK_UPDATE_TASKS_TOOL: Tool = {
           priority: {
             type: "number",
             description:
-              "Filter tasks by priority level 1 (highest) to 4 (lowest) (optional)",
+              "Filter tasks by priority: 1=P1 (urgent), 2=P2, 3=P3, 4=P4 (normal) (optional)",
             enum: [1, 2, 3, 4],
           },
           due_before: {
@@ -468,7 +470,7 @@ export const BULK_DELETE_TASKS_TOOL: Tool = {
       priority: {
         type: "number",
         description:
-          "Delete tasks with this priority level 1 (highest) to 4 (lowest) (optional)",
+          "Delete tasks with priority: 1=P1 (urgent), 2=P2, 3=P3, 4=P4 (normal) (optional)",
         enum: [1, 2, 3, 4],
       },
       due_before: {
@@ -503,7 +505,7 @@ export const BULK_COMPLETE_TASKS_TOOL: Tool = {
       priority: {
         type: "number",
         description:
-          "Complete tasks with this priority level 1 (highest) to 4 (lowest) (optional)",
+          "Complete tasks with priority: 1=P1 (urgent), 2=P2, 3=P3, 4=P4 (normal) (optional)",
         enum: [1, 2, 3, 4],
       },
       due_before: {

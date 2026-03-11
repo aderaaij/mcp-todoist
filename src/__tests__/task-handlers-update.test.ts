@@ -1,10 +1,33 @@
 import { describe, expect, test, jest } from "@jest/globals";
+import type { TodoistApi } from "@doist/todoist-api-typescript";
+import type { TodoistTask } from "../types.js";
+
+// Mock the api-helpers module so fetchAllTasks delegates to mock client
+jest.mock("../utils/api-helpers.js", () => {
+  const actual = jest.requireActual("../utils/api-helpers.js") as Record<
+    string,
+    unknown
+  >;
+  return {
+    ...actual,
+    fetchAllTasks: jest.fn(
+      async (
+        client: { getTasks: (params?: unknown) => Promise<unknown> },
+        params?: unknown
+      ) => {
+        const result = await client.getTasks(params);
+        if (Array.isArray(result)) return result;
+        const obj = result as { results?: unknown[] };
+        return obj?.results || [];
+      }
+    ),
+  };
+});
+
 import {
   handleUpdateTask,
   handleBulkUpdateTasks,
 } from "../handlers/task-handlers";
-import type { TodoistApi } from "@doist/todoist-api-typescript";
-import type { TodoistTask } from "../types.js";
 
 type ApiTask = Awaited<ReturnType<TodoistApi["getTask"]>>;
 type ApiTaskList = Awaited<ReturnType<TodoistApi["moveTasks"]>>;
@@ -77,10 +100,15 @@ describe("handleUpdateTask section moves", () => {
       },
     ] as unknown as ApiTaskList);
 
+    const getProject = jest
+      .fn<TodoistApi["getProject"]>()
+      .mockResolvedValue({ id: "proj-new", name: "New Project" } as any);
+
     const todoistClient = {
       getTask,
       updateTask,
       moveTasks,
+      getProject,
     } as unknown as TodoistApi;
 
     const message = await handleUpdateTask(todoistClient, {
@@ -95,7 +123,7 @@ describe("handleUpdateTask section moves", () => {
     expect(moveTasks).toHaveBeenCalledWith(["a1"], {
       projectId: "proj-new",
     });
-    expect(message).toContain("New Project ID: proj-new");
+    expect(message).toContain("New Project: New Project");
     expect(message).toContain("New Title: Updated");
   });
 });

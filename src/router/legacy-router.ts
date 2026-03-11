@@ -94,6 +94,7 @@ import {
   handleQuickAddTask,
   handleGetCompletedTasks,
 } from "../handlers/task-handlers.js";
+import { GetCompletedTasksArgs } from "../types/index.js";
 import {
   handleGetProjects,
   handleGetSections,
@@ -264,9 +265,7 @@ export async function handleLegacyToolCall(
 
     case "todoist_completed_tasks_get":
       if (!isGetCompletedTasksArgs(args)) {
-        throw new Error(
-          "Invalid arguments for todoist_completed_tasks_get"
-        );
+        throw new Error("Invalid arguments for todoist_completed_tasks_get");
       }
       return await handleGetCompletedTasks(client, args);
 
@@ -740,6 +739,12 @@ export async function handleLegacyToolCall(
       );
       return JSON.stringify(featuresResult, null, 2);
     }
+
+    case "todoist_completed_tasks_get":
+      return await handleGetCompletedTasks(
+        client,
+        args as GetCompletedTasksArgs
+      );
 
     case "todoist_test_performance": {
       const performanceResult = await handleTestPerformance(
